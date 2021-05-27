@@ -1,8 +1,6 @@
 package com.ejemplo.clienteshttp;
 
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -38,8 +36,6 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
 //import org.slf4j.LoggerFactory;
-
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,65 +45,57 @@ import org.apache.logging.log4j.Logger;
  * 
  * 	- IMPLEMENTA HTTPCLIENT 4.5.13
  * 
- * @author GRN 
+ * @author RGN 
  *
  */
 public class ClienteHttp4513 {
 	
+	
     private static final Logger LOG = LogManager.getLogger(ClienteHttp4513.class.getName());
     //private static org.slf4j.Logger LOG = LoggerFactory.getLogger(ClienteHttp4513Ejemplo.class);
+
+    //Charset UTF-8
+  	private static final  String CHARSET_UTF_8 = "UTF-8";	
+  	
+  	//Salto linea
+  	private static String NEW_LINE = System.getProperty("line.separator");	
 
 	
 	private static final int MIN_COD_ERROR_HTTP = 300;
 	
-	private Properties prop = new Properties();
 	
 	//Constantes TLS
 	public static final String TLSv1_2 = "TLSv1.2";
 	public static final String TLSv1_3 = "TLSv1.3";
 	
 	//Version TLS. Por defecto  TLSv1.3
-	private String VERSION_TLS = TLSv1_3; 
+	private String versionTLS = TLSv1_3; 
 	
-	//En milisegundos x Defecto (60 segundos)
-	private static int CONNECTION_TIME_OUT = 60000;  
-	
-	//Charset UTF-8
-	private static final  String CHARSET_UTF_8 = "UTF-8";	
-	
-	//Salto linea
-	private static String NEW_LINE = System.getProperty("line.separator");	
-
-
-	private void loadProperties() {
+	//Puerto ssl
+	private int portSSL = 443;  
 		
-		 try (InputStream input = ClienteHttp4513.class.getClassLoader().getResourceAsStream("app.properties")) {
-
-	         
-	            if (input == null) {
-	                System.out.println("Sorry, unable to find app.properties");
-	                return;
-	            }
-
-	            //load a properties file from class path, inside static method
-	            this.prop.load(input);
-	           
-	            if (prop.getProperty("VERSION_TLS")!=null) VERSION_TLS = prop.getProperty("VERSION_TLS");
-	            if (prop.getProperty("CONNECTION_TIME_OUT")!=null) CONNECTION_TIME_OUT = Integer.parseInt(prop.getProperty("CONNECTION_TIME_OUT"));
-
-	        } catch (IOException ex) {
-	            ex.printStackTrace();
-	        }
-	}
+	//En milisegundos x Defecto (60 segundos)
+	private int connectionTimeOut = 60000;  
 	
+
 	
 	/**
 	 * Constructor
 	 * 
 	 */
-	public ClienteHttp4513() {
+	public ClienteHttp4513(Properties properties) {
 		
-		loadProperties();
+		// Sobreescribir variables si vienen: versionTLS, portSSL, connectionTimeOut
+        if (properties.getProperty("VERSION_TLS")!=null) {
+        	versionTLS = properties.getProperty("VERSION_TLS").trim();
+        }
+        if (properties.getProperty("PORT_SSL")!=null && !properties.getProperty("PORT_SSL").isBlank()) {
+        	portSSL = Integer.parseInt(properties.getProperty("PORT_SSL").trim());
+        }
+        if (properties.getProperty("CONNECTION_TIME_OUT")!=null  && !properties.getProperty("PORT_SSL").isBlank()) {
+        	connectionTimeOut = Integer.parseInt(properties.getProperty("CONNECTION_TIME_OUT").trim());
+        }
+
 	}
 
 	
@@ -652,11 +640,11 @@ public class ClienteHttp4513 {
 	   //Aceptar todos los certificados (no los comprueba, no instados en cliente JVM,etc)
 	   TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
 	   //Crear SSL CONTEXT
-	   SSLContext sslContext = SSLContexts.custom().setProtocol(VERSION_TLS).loadTrustMaterial(null, acceptingTrustStrategy).build();
+	   SSLContext sslContext = SSLContexts.custom().setProtocol(versionTLS).loadTrustMaterial(null, acceptingTrustStrategy).build();
 	   SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);	
 	  
 	   //S�lo para mostrar  trazas. (NO UTILIZAR PARA CONFIGURAR CERTIFICADOS, ESO SE HACE EN loadTrustMaterial)
-	   this.inicializarTrusrManagerParaSoloTrazas(sslContext);
+	   this.inicializarTrusrManager(sslContext);
 	 
 		//CREAR FACTORIA, HTTP  y HTTPS	 
 		Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory> create()
@@ -672,27 +660,26 @@ public class ClienteHttp4513 {
 															  //_noHaceFalta_.setSSLSocketFactory(sslsf)
 															  .setConnectionManager(connectionManager)
 															  .setDefaultRequestConfig(
-																	  RequestConfig.custom().setConnectionRequestTimeout(CONNECTION_TIME_OUT) 
-												                							.setConnectTimeout(CONNECTION_TIME_OUT)
-												                							.setSocketTimeout(CONNECTION_TIME_OUT).build()
+																	  RequestConfig.custom().setConnectionRequestTimeout(connectionTimeOut) 
+												                							.setConnectTimeout(connectionTimeOut)
+												                							.setSocketTimeout(connectionTimeOut).build()
 												                )
 															  .disableCookieManagement() //desactivar gestion cookies
 															  .build();
 	
-		LOG.info(" ---> CONFIGURADO HTTPCLIENT CON VERSION_TLS:  "+ VERSION_TLS);
+		LOG.info(" ---> CONFIGURADO HTTPCLIENT CON VERSION_TLS:  "+ versionTLS);
 		return closeableHttpClient;
 	}
 
 	
 	/**
-	 * INICIALIZAR TRUST MANAGER PARA SOLO PARA TRAZAR
+	 * INICIALIZAR TRUST MANAGER (lo utilizamos sólo para trazas)
 	 * 
 	 * @param sslContext
 	 */
-	private void inicializarTrusrManagerParaSoloTrazas(SSLContext sslContext)  {
+	private void inicializarTrusrManager(SSLContext sslContext)  {
 		
 		try {
-			//solo lo utilizamos  para trazas, en sslContext es donde se configura certificados,etc.
 			   TrustManager tm = new X509TrustManager() {
 			    	public java.security.cert.X509Certificate[] getAcceptedIssuers() {
 			    		LOG.debug(" getAcceptedIssuers():OK");		
@@ -709,12 +696,12 @@ public class ClienteHttp4513 {
 						}	
 					}
 				}; 
-				//solo para trazas
+				
 				sslContext.init(null, new TrustManager[]{tm}, null);
 				
 		} catch (Exception e) {
-			LOG.error(" Error al  inicializarTrusrManagerParaSoloTrazas: " + e.getMessage() );	
-			//no lanzar, solo es para trazear
+			LOG.error(" Error al  inicializarTrusrManager: " + e.getMessage() );	
+			//no lanzar
 		}
 	}
 	
