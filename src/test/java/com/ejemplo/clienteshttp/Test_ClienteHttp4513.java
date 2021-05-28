@@ -23,7 +23,7 @@ public class Test_ClienteHttp4513 {
 	private static Properties properties;
 
 	//Cliente  
-	private ClienteHttp4513 clienteHttp;
+	private ClienteHttp51 clienteHttp;
 	
 
 	//CARPETA Para archivos xml, json,etc.
@@ -74,7 +74,7 @@ public class Test_ClienteHttp4513 {
 		String urlPeticion = properties.getProperty("URL_PETICION_GET"); 	 
 		
 		//CALL HTTP
-		clienteHttp = new ClienteHttp4513(properties);	
+		clienteHttp = new ClienteHttp51(properties);	
 
 		//Objeto de negocio respuesta cliente 
 		RespuestaClienteHttp respuestaCliente = clienteHttp.realizarPeticion_GET(urlPeticion);
@@ -109,7 +109,7 @@ public class Test_ClienteHttp4513 {
 		String datosXML = FileUtils.readFileToString(ficheroDatosXML, "UTF-8");		
 		
 		//CALL WS
-		clienteHttp = new ClienteHttp4513(properties);
+		clienteHttp = new ClienteHttp51(properties);
 		//Objeto respuesta de negocio
 		RespuestaClienteHttp respuestaCliente  = clienteHttp.realizarPeticion_POST(urlPeticion, datosXML);
 			
@@ -129,7 +129,7 @@ public class Test_ClienteHttp4513 {
 		String urlPeticion = properties.getProperty("URL_PETICION_DELETE"); 	 
 					
 		//CALL WS
-		clienteHttp = new ClienteHttp4513(properties);
+		clienteHttp = new ClienteHttp51(properties);
 		
 		//Objeto de negocio respuesta cliente 
 		RespuestaClienteHttp respuestaCliente = clienteHttp.realizarPeticion_DELETE(urlPeticion);
@@ -153,7 +153,7 @@ public class Test_ClienteHttp4513 {
 		String datosXML = FileUtils.readFileToString(ficheroDatosXML, "UTF-8");		
 	 
 		//CALL HTTP PUT
-		clienteHttp = new ClienteHttp4513(properties);	
+		clienteHttp = new ClienteHttp51(properties);	
 		
 		//Objeto respuesta de negocio
 		RespuestaClienteHttp respuestaCliente  = clienteHttp.realizarPeticion_PUT(urlPeticion, datosXML);
