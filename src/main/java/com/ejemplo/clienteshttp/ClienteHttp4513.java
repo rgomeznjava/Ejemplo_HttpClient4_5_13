@@ -43,9 +43,9 @@ import org.apache.logging.log4j.Logger;
 /**
  * 	CLIENTE HTTP CLIENT EJEMPLO CRUD
  * 
- * 	- IMPLEMENTA HTTPCLIENT 4.5.13
+ * 	- IMPLEMENTA HTTPCLIENT 4.5.13 
  * 
- * @author RGN 
+ * @author Raul Gomez Nieto 
  *
  */
 public class ClienteHttp4513 {
