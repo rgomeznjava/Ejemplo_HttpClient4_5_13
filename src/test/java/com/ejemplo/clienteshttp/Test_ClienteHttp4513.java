@@ -45,7 +45,7 @@ public class Test_ClienteHttp4513 {
 		//RUTA_PRUEBAS = "C:/PRUEBAS/";
 		
 		//Load de fichero
-		properties = loadPropertiesFile("application.properties");
+		properties = Utilidades.loadPropertiesFile("application.properties");
 		
 		//add o sobreescribir parametros
 		
@@ -166,25 +166,6 @@ public class Test_ClienteHttp4513 {
 	
 	
 	
-	private static Properties loadPropertiesFile(String nombreProperties) throws Exception {
-		
-		Properties properties = new Properties();
-		
-		 try (InputStream input = ClienteHttp4513.class.getClassLoader().getResourceAsStream(nombreProperties)) {
-
-	            if (input == null) {
-	               
-	               throw new Exception("Sorry, unable to find " + nombreProperties);
-	            }
-
-	            //load a properties file from class path, inside static method
-	            properties.load(input);
-	           
-	        } catch (IOException ex) {
-	        	  throw new Exception("Sorry, unable to find " + nombreProperties + " error:"+ex.getMessage());
-	        }
-		 return properties;
-	}
 	
 } //_fin
 	
