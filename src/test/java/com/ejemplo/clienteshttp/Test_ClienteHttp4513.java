@@ -1,6 +1,9 @@
 package com.ejemplo.clienteshttp;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
@@ -17,39 +20,50 @@ public class Test_ClienteHttp4513 {
 
 	//Salto linea
 	private static final String NEW_LINE = System.getProperty("line.separator");	
+	
+	//Propiedades para configuración, pruebas,etc.
+	private static Properties properties;
 
 	//Cliente  
 	private ClienteHttp4513 clienteHttp;
 	
-	//Credenciales (caso de usarlas)
-	private	static	String USUARIO = "XXXXXXXX";	  	 
-	private	static	String PASSWORD = "XXXXXXXX";	     
-	
+
 	//CARPETA Para archivos xml, json,etc.
 	private static  String RUTA_PRUEBAS = "/PRUEBAS/";
 		
-	//URL PETICION DE PRUEBA
-	private static String URL_PETICION= "xxxxxxxxxxxxxxxxxx";
 	
 	
 	/**
-	 *  Inicializar ClienteHttp4512  y datos comunes para todos los Test
+	 *  Inicializar  datos  para  los Test
 	 * 
 	 * @throws Exception
 	 */
 	@Before
 	public  void _testInicializar() throws Exception {
 		
+		
 		//RUTA_PRUEBAS = "C:/PRUEBAS/";
 		
-		USUARIO = "XXXXXX";    
-		PASSWORD = "XXXXXX";
+		//Load de fichero
+		properties = loadPropertiesFile("application.properties");
 		
-		URL_PETICION = "https://dummy.restapiexample.com/api/v1/employees";
-		//URL_PETICION = "https://www.google.es";
+		//add o sobreescribir parametros
+		
+		properties.put("URL_PETICION_GET","https://dummy.restapiexample.com/api/v1/employees/");
+		properties.put("URL_PETICION_POST","https://xxxxxx/");
+		properties.put("URL_PETICION_PUT","https://xxxxxxx/");
+		properties.put("URL_PETICION_DELETE","https://xxxxx/");
+
+		properties.put("URL_PETICION_GOOGLE","https://www.google.es");
+
+		//Credenciales (caso de usarlas)
+		properties.put("USUARIO","XXXXXX");
+		properties.put("PASSWORD","XXXXXX");
 
 	}	
 	 
+	
+	
 	
 	//@Ignore ("descomentar para ignorar")	
 	@Test
@@ -59,10 +73,10 @@ public class Test_ClienteHttp4513 {
 		
 		 
 		//url peticion
-		String urlPeticion = URL_PETICION;			
+		String urlPeticion = properties.getProperty("URL_PETICION_GET"); 	 
 		
 		//CALL HTTP
-		clienteHttp = new ClienteHttp4513();	
+		clienteHttp = new ClienteHttp4513(properties);	
 
 		//Objeto de negocio respuesta cliente 
 		RespuestaClienteHttp respuestaCliente = clienteHttp.realizarPeticion_GET(urlPeticion);
@@ -89,7 +103,7 @@ public class Test_ClienteHttp4513 {
 		
 		System.out.println(NEW_LINE+"TEST ---> PRUEBA POST XML....");
 		
-		String urlPeticion = URL_PETICION; 	 
+		String urlPeticion = properties.getProperty("URL_PETICION_POST"); 	 
 		
 		//Datos XML a enviar, obtenidos de file
 		String nombreArchivoXML = "datos.xml";
@@ -97,7 +111,7 @@ public class Test_ClienteHttp4513 {
 		String datosXML = FileUtils.readFileToString(ficheroDatosXML, "UTF-8");		
 		
 		//CALL WS
-		clienteHttp = new ClienteHttp4513();
+		clienteHttp = new ClienteHttp4513(properties);
 		//Objeto respuesta de negocio
 		RespuestaClienteHttp respuestaCliente  = clienteHttp.realizarPeticion_POST(urlPeticion, datosXML);
 			
@@ -114,10 +128,11 @@ public class Test_ClienteHttp4513 {
 		
 		  
 		//url peticion
-		String urlPeticion = URL_PETICION;	
+		String urlPeticion = properties.getProperty("URL_PETICION_DELETE"); 	 
 					
 		//CALL WS
-		clienteHttp = new ClienteHttp4513();
+		clienteHttp = new ClienteHttp4513(properties);
+		
 		//Objeto de negocio respuesta cliente 
 		RespuestaClienteHttp respuestaCliente = clienteHttp.realizarPeticion_DELETE(urlPeticion);
 	
@@ -132,7 +147,7 @@ public class Test_ClienteHttp4513 {
 		
 		System.out.println(NEW_LINE+"TEST ---> MODIFICAR  PUT....");
 		 
-		String urlPeticion = URL_PETICION; 	 
+		String urlPeticion = properties.getProperty("URL_PETICION_PUT"); 	 
 		
 		//Datos XML a enviar, obtenidos de file
 		String nombreArchivoXML = "datos.xml";
@@ -140,7 +155,8 @@ public class Test_ClienteHttp4513 {
 		String datosXML = FileUtils.readFileToString(ficheroDatosXML, "UTF-8");		
 	 
 		//CALL HTTP PUT
-		clienteHttp = new ClienteHttp4513();	
+		clienteHttp = new ClienteHttp4513(properties);	
+		
 		//Objeto respuesta de negocio
 		RespuestaClienteHttp respuestaCliente  = clienteHttp.realizarPeticion_PUT(urlPeticion, datosXML);
 			
@@ -148,6 +164,27 @@ public class Test_ClienteHttp4513 {
 		Assert.assertTrue("TEST MODIFICAR  NO HA PASADO: SE ESPERABA 200- OK", respuestaCliente.getCodigoEstado()==200);
 	}
 	
+	
+	
+	private static Properties loadPropertiesFile(String nombreProperties) throws Exception {
+		
+		Properties properties = new Properties();
+		
+		 try (InputStream input = ClienteHttp4513.class.getClassLoader().getResourceAsStream(nombreProperties)) {
+
+	            if (input == null) {
+	               
+	               throw new Exception("Sorry, unable to find " + nombreProperties);
+	            }
+
+	            //load a properties file from class path, inside static method
+	            properties.load(input);
+	           
+	        } catch (IOException ex) {
+	        	  throw new Exception("Sorry, unable to find " + nombreProperties + " error:"+ex.getMessage());
+	        }
+		 return properties;
+	}
 	
 } //_fin
 	
