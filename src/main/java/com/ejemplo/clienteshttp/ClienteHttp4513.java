@@ -89,10 +89,10 @@ public class ClienteHttp4513 {
         if (properties.getProperty("VERSION_TLS")!=null) {
         	versionTLS = properties.getProperty("VERSION_TLS").trim();
         }
-        if (properties.getProperty("PORT_SSL")!=null && !properties.getProperty("PORT_SSL").isBlank()) {
+        if (properties.getProperty("PORT_SSL")!=null && properties.getProperty("PORT_SSL").trim().length()>0) {
         	portSSL = Integer.parseInt(properties.getProperty("PORT_SSL").trim());
         }
-        if (properties.getProperty("CONNECTION_TIME_OUT")!=null  && !properties.getProperty("PORT_SSL").isBlank()) {
+        if (properties.getProperty("CONNECTION_TIME_OUT")!=null  && properties.getProperty("CONNECTION_TIME_OUT").trim().length()>0) {
         	connectionTimeOut = Integer.parseInt(properties.getProperty("CONNECTION_TIME_OUT").trim());
         }
 
