@@ -48,10 +48,10 @@ import org.apache.logging.log4j.Logger;
  * @author RGN 
  *
  */
-public class ClienteHttp51 {
+public class ClienteHttp4513 {
 	
 	
-    private static final Logger LOG = LogManager.getLogger(ClienteHttp51.class.getName());
+    private static final Logger LOG = LogManager.getLogger(ClienteHttp4513.class.getName());
     //private static org.slf4j.Logger LOG = LoggerFactory.getLogger(ClienteHttp4513Ejemplo.class);
 
     //Charset UTF-8
@@ -83,7 +83,7 @@ public class ClienteHttp51 {
 	 * Constructor
 	 * 
 	 */
-	public ClienteHttp51(Properties properties) {
+	public ClienteHttp4513(Properties properties) {
 		
 		// Sobreescribir variables si vienen: versionTLS, portSSL, connectionTimeOut
         if (properties.getProperty("VERSION_TLS")!=null) {
